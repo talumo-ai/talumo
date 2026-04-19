@@ -1,0 +1,31 @@
+"""Application settings loaded from environment variables."""
+
+from __future__ import annotations
+
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    # Local llama-server
+    local_base_url: str = "http://localhost:8080/v1"
+    local_model_name: str = "local"
+
+    # LiteLLM gateway
+    litellm_base_url: str = "http://localhost:4000/v1"
+    litellm_cheap_model: str = "cheap"
+    litellm_frontier_model: str = "frontier"
+    litellm_api_key: str = "sk-litellm"
+
+    # Orchestrator
+    max_tokens: int = 2048
+    temperature: float = 0.2
+    request_timeout: float = 120.0
+
+    # Validation thresholds
+    min_output_chars: int = 20
+    max_output_chars: int = 50_000
+
+    model_config = {"env_prefix": "ZORA_"}
+
+
+settings = Settings()

@@ -1,0 +1,20 @@
+model_list:
+  # Cheap remote model group
+  - model_name: cheap
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  # Frontier remote model group
+  - model_name: frontier
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+litellm_settings:
+  drop_params: true
+  num_retries: 1
+  request_timeout: 120
+
+general_settings:
+  master_key: sk-litellm

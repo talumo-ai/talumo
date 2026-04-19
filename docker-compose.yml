@@ -1,0 +1,39 @@
+services:
+  # ---------- local inference ----------
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./models:/models
+    command: >
+      --model /models/model.gguf
+      --host 0.0.0.0
+      --port 8080
+      --ctx-size 4096
+      --n-gpu-layers 99
+    # Place your GGUF file in ./models/model.gguf before starting
+
+  # ---------- LiteLLM gateway ----------
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./config/litellm_config.yaml:/app/config.yaml
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+
+  # ---------- Orchestrator ----------
+  orchestrator:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ZORA_LOCAL_BASE_URL=http://llama-server:8080/v1
+      - ZORA_LITELLM_BASE_URL=http://litellm:4000/v1
+      - ZORA_LITELLM_API_KEY=sk-litellm
+    depends_on:
+      - llama-server
+      - litellm
