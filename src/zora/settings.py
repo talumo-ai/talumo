@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     litellm_cheap_model: str = "cheap"
     litellm_frontier_model: str = "frontier"
     litellm_api_key: str = "sk-litellm"
+    # Optional for local-only runs; required when remote tiers are used.
+    openai_api_key: str = Field(default="", validation_alias="OPENAI_API_KEY")
 
     # Orchestrator
     max_tokens: int = 2048

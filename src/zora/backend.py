@@ -8,6 +8,10 @@ from zora.schemas import Message, Tier
 from zora.settings import settings
 
 
+class RemoteAPIKeyMissingError(RuntimeError):
+    """Raised when a remote tier is requested without OPENAI_API_KEY configured."""
+
+
 def _base_url_for(tier: Tier) -> str:
     return settings.litellm_base_url
 
@@ -49,6 +53,11 @@ async def call_model(
     temperature: float | None = None,
 ) -> ModelResult:
     """Send a chat-completion request to the tier's backend and return the result."""
+    if tier != Tier.LOCAL and not settings.openai_api_key:
+        raise RemoteAPIKeyMissingError(
+            "OPENAI_API_KEY is not set; remote tiers require a provider API key"
+        )
+
     payload: dict[str, object] = {
         "model": _model_for(tier),
         "messages": [m.model_dump() for m in messages],

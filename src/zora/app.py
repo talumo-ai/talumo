@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+import logging
 
 import httpx
 from fastapi import FastAPI, Request
@@ -11,10 +12,18 @@ from fastapi.responses import JSONResponse
 
 from zora.orchestrator import orchestrate
 from zora.schemas import OrchRequest, OrchResponse
+from zora.settings import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    if not settings.openai_api_key:
+        logger.warning(
+            "OPENAI_API_KEY is not set. Local tier can run, but remote tiers will fail if used."
+        )
     app.state.client = httpx.AsyncClient()
     yield
     await app.state.client.aclose()

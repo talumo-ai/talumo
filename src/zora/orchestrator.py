@@ -15,7 +15,7 @@ import time
 
 import httpx
 
-from zora.backend import ModelResult, call_model
+from zora.backend import ModelResult, RemoteAPIKeyMissingError, call_model
 from zora.classifier import classify, next_tier
 from zora.schemas import (
     OrchRequest,
@@ -62,6 +62,10 @@ async def orchestrate(req: OrchRequest, client: httpx.AsyncClient) -> OrchRespon
         t0 = time.monotonic()
         try:
             result = await call_model(tier, req.messages, client=client)
+        except RemoteAPIKeyMissingError as exc:
+            elapsed = (time.monotonic() - t0) * 1000
+            trace.append(_make_step(tier, "unknown", Verdict.ESCALATE, [str(exc)], elapsed))
+            break
         except (httpx.HTTPStatusError, httpx.ConnectError, httpx.TimeoutException) as exc:
             elapsed = (time.monotonic() - t0) * 1000
             reasons = [f"Backend error: {exc!r}"]

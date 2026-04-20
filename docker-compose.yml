@@ -23,7 +23,7 @@ services:
     volumes:
       - ./config/litellm_config.yaml:/app/config.yaml
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     depends_on:
       - llama-server
@@ -37,5 +37,6 @@ services:
       # All tiers route through LiteLLM; local tier is LiteLLM model alias "local".
       - ZORA_LITELLM_BASE_URL=http://litellm:4000/v1
       - ZORA_LITELLM_API_KEY=sk-litellm
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     depends_on:
       - litellm
