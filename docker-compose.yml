@@ -34,6 +34,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # All tiers route through LiteLLM; local tier is LiteLLM model alias "local".
       - ZORA_LITELLM_BASE_URL=http://litellm:4000/v1
       - ZORA_LITELLM_API_KEY=sk-litellm
     depends_on:

@@ -5,14 +5,14 @@ A minimal orchestration layer that routes LLM requests through a local-first tie
 ## Architecture
 
 ```
-Client → FastAPI Orchestrator → llama-server (local)
-                               → LiteLLM → cheap remote model
-                               → LiteLLM → frontier remote model
+Client → FastAPI Orchestrator → LiteLLM Gateway → llama-server (local tier)
+                                               → cheap remote model
+                                               → frontier remote model
 ```
 
 The orchestrator:
 1. Classifies the request to pick an initial tier
-2. Calls the model backend
+2. Calls LiteLLM with the tier's model alias (`local`, `cheap`, or `frontier`)
 3. Validates the output (length, refusal detection, JSON/code checks)
 4. Retries once on the same tier if repairable
 5. Escalates to the next tier if still failing
@@ -53,11 +53,18 @@ uvicorn zora.app:app --port 8000
 Place a GGUF model at `./models/model.gguf`, then:
 
 ```bash
+# Needed for remote tiers; keep set even if mostly using local tier.
 export OPENAI_API_KEY=sk-...
 docker compose up
 ```
 
 This starts llama-server (port 8080), LiteLLM (port 4000), and the orchestrator (port 8000).
+
+For GPU inference in llama-server:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.cuda.yml up
+```
 
 ## Example request
 
@@ -84,7 +91,10 @@ All settings are configurable via environment variables with `ZORA_` prefix:
 | `ZORA_LITELLM_CHEAP_MODEL` | `cheap` | LiteLLM model name for cheap tier |
 | `ZORA_LITELLM_FRONTIER_MODEL` | `frontier` | LiteLLM model name for frontier tier |
 | `ZORA_MAX_TOKENS` | `2048` | Max tokens per completion |
+| `ZORA_TEMPERATURE` | `0.2` | Sampling temperature |
+| `ZORA_REQUEST_TIMEOUT` | `120.0` | Backend request timeout in seconds |
 | `ZORA_MIN_OUTPUT_CHARS` | `20` | Minimum acceptable output length |
+| `ZORA_MAX_OUTPUT_CHARS` | `50000` | Maximum acceptable output length |
 
 ## Tier selection rules
 
