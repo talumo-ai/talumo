@@ -9,24 +9,22 @@ from zora.settings import settings
 
 
 def _base_url_for(tier: Tier) -> str:
-    if tier == Tier.LOCAL:
-        return settings.local_base_url
     return settings.litellm_base_url
 
 
 def _model_for(tier: Tier) -> str:
     if tier == Tier.LOCAL:
-        return settings.local_model_name
+        return settings.litellm_local_model
     if tier == Tier.REMOTE_CHEAP:
         return settings.litellm_cheap_model
     return settings.litellm_frontier_model
 
 
 def _headers_for(tier: Tier) -> dict[str, str]:
-    headers: dict[str, str] = {"Content-Type": "application/json"}
-    if tier != Tier.LOCAL:
-        headers["Authorization"] = f"Bearer {settings.litellm_api_key}"
-    return headers
+    return {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {settings.litellm_api_key}",
+    }
 
 
 # ---------------------------------------------------------------------------
