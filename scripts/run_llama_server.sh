@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 # Launch llama-server locally (outside Docker).
-# Adjust MODEL_PATH to your GGUF file.
+# Set MODEL_PATH in your shell/.env or pass it as an argument.
 #
 # Usage:
 #   ./run_llama_server.sh <path-to-model.gguf>           # CPU only
 #   ENABLE_CUDA=true ./run_llama_server.sh <model.gguf>  # GPU accelerated
+#   MODEL_PATH=./models/model.gguf ./run_llama_server.sh  # from env
 set -euo pipefail
 
-MODEL_PATH="${1:?Usage: $0 <path-to-model.gguf>}"
+MODEL_PATH="${1:-${MODEL_PATH:-}}"
+if [[ -z "$MODEL_PATH" ]]; then
+  echo "Usage: $0 <path-to-model.gguf> or set MODEL_PATH in environment" >&2
+  exit 1
+fi
 ENABLE_CUDA="${ENABLE_CUDA:-false}"
 N_GPU_LAYERS="${N_GPU_LAYERS:-99}"
 
