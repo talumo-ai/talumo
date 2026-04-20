@@ -50,12 +50,12 @@ uvicorn zora.app:app --port 8000
 
 ## Running with Docker Compose
 
-Copy `.env.example` to `.env`, adjust model location values if needed, and set your API key:
+Copy `.env.example` to `.env` and adjust model location values if needed:
 
 ```bash
 cp .env.example .env
 
-# Needed for remote tiers; keep set even if mostly using local tier.
+# Optional for local-only runs; required if a request uses remote tiers.
 export OPENAI_API_KEY=sk-...
 docker compose up
 ```

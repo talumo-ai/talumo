@@ -21,6 +21,12 @@ from zora.schemas import (
 from zora.settings import settings
 
 
+@pytest.fixture(autouse=True)
+def _set_openai_key_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep historical test behavior unless a test overrides the key explicitly."""
+    monkeypatch.setattr(settings, "openai_api_key", "test-openai-key")
+
+
 def _req(**kw: object) -> OrchRequest:
     defaults: dict[str, object] = {
         "task_type": TaskType.DRAFT,
@@ -176,3 +182,20 @@ async def test_final_goes_to_frontier(httpx_mock: HTTPXMock) -> None:
 
     assert resp.tier_used == Tier.REMOTE_FRONTIER
     assert resp.trace[0].tier == Tier.REMOTE_FRONTIER
+
+
+@pytest.mark.asyncio
+async def test_missing_openai_key_fails_only_when_remote_is_used() -> None:
+    """Missing OPENAI_API_KEY should fail on remote-tier attempts without HTTP retries."""
+    settings.openai_api_key = ""
+    req = _req(task_type=TaskType.ANALYSIS, can_test=True)
+
+    async with httpx.AsyncClient() as client:
+        resp = await orchestrate(req, client)
+
+    assert resp.tier_used == Tier.REMOTE_CHEAP
+    assert resp.content == ""
+    assert resp.finish_reason == "error"
+    assert len(resp.trace) == 1
+    assert resp.trace[0].tier == Tier.REMOTE_CHEAP
+    assert "OPENAI_API_KEY is not set" in resp.trace[0].reasons[0]
