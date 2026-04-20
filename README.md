@@ -50,9 +50,11 @@ uvicorn zora.app:app --port 8000
 
 ## Running with Docker Compose
 
-Place a GGUF model at `./models/model.gguf`, then:
+Copy `.env.example` to `.env`, adjust model location values if needed, and set your API key:
 
 ```bash
+cp .env.example .env
+
 # Needed for remote tiers; keep set even if mostly using local tier.
 export OPENAI_API_KEY=sk-...
 docker compose up
@@ -65,6 +67,12 @@ For GPU inference in llama-server:
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.cuda.yml up
 ```
+
+Model path variables used by Compose (`.env`):
+
+- `LLAMA_MODEL_HOST_DIR` (default `./models`)
+- `LLAMA_MODEL_CONTAINER_DIR` (default `/models`)
+- `LLAMA_MODEL_FILE` (default `model.gguf`)
 
 ## Example request
 
