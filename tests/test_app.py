@@ -38,7 +38,7 @@ class TestHealthEndpoint:
 class TestOrchestrateEndpoint:
     def test_valid_request_returns_200(self, httpx_mock: HTTPXMock) -> None:
         httpx_mock.add_response(
-            url=f"{settings.local_base_url}/chat/completions",
+            url=f"{settings.litellm_base_url}/chat/completions",
             json=_completion(GOOD),
         )
         body = {

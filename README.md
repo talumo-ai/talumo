@@ -78,9 +78,9 @@ All settings are configurable via environment variables with `ZORA_` prefix:
 
 | Variable | Default | Description |
 |---|---|---|
-| `ZORA_LOCAL_BASE_URL` | `http://localhost:8080/v1` | llama-server endpoint |
 | `ZORA_LITELLM_BASE_URL` | `http://localhost:4000/v1` | LiteLLM gateway endpoint |
 | `ZORA_LITELLM_API_KEY` | `sk-litellm` | LiteLLM master key |
+| `ZORA_LITELLM_LOCAL_MODEL` | `local` | LiteLLM model name for local tier |
 | `ZORA_LITELLM_CHEAP_MODEL` | `cheap` | LiteLLM model name for cheap tier |
 | `ZORA_LITELLM_FRONTIER_MODEL` | `frontier` | LiteLLM model name for frontier tier |
 | `ZORA_MAX_TOKENS` | `2048` | Max tokens per completion |

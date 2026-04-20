@@ -25,6 +25,8 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     command: ["--config", "/app/config.yaml", "--port", "4000"]
+    depends_on:
+      - llama-server
 
   # ---------- Orchestrator ----------
   orchestrator:
@@ -32,9 +34,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ZORA_LOCAL_BASE_URL=http://llama-server:8080/v1
       - ZORA_LITELLM_BASE_URL=http://litellm:4000/v1
       - ZORA_LITELLM_API_KEY=sk-litellm
     depends_on:
-      - llama-server
       - litellm

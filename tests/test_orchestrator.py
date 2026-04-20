@@ -55,7 +55,7 @@ GOOD_OUTPUT = "Here is a thorough draft response with sufficient content for the
 async def test_local_first_routing(httpx_mock: HTTPXMock) -> None:
     """A private draft request should route to the local backend and return PASS."""
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion(GOOD_OUTPUT, model="local-model"),
     )
     async with httpx.AsyncClient() as client:
@@ -74,12 +74,12 @@ async def test_validation_catches_short_output(httpx_mock: HTTPXMock) -> None:
     """A short response triggers RETRY, then a good response should PASS."""
     # First call → too short
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion("no"),
     )
     # Retry → good
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion(GOOD_OUTPUT),
     )
     async with httpx.AsyncClient() as client:
@@ -97,12 +97,12 @@ async def test_validation_catches_refusal(httpx_mock: HTTPXMock) -> None:
     refusal = "I'm sorry, I cannot help with that request."
     # First call → refusal
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion(refusal),
     )
     # Retry → still a refusal
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion(refusal),
     )
     # Escalation to cheap → good
@@ -126,12 +126,12 @@ async def test_escalation_on_backend_error(httpx_mock: HTTPXMock) -> None:
     """If the local backend errors twice, we escalate to remote_cheap."""
     # Local → error
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         status_code=500,
     )
     # Local retry → error again
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         status_code=500,
     )
     # Escalate to cheap → success
@@ -152,7 +152,7 @@ async def test_escalation_on_backend_error(httpx_mock: HTTPXMock) -> None:
 async def test_response_always_has_trace(httpx_mock: HTTPXMock) -> None:
     """Every response includes a request_id, content, and non-empty trace."""
     httpx_mock.add_response(
-        url=f"{settings.local_base_url}/chat/completions",
+        url=f"{settings.litellm_base_url}/chat/completions",
         json=_completion(GOOD_OUTPUT),
     )
     async with httpx.AsyncClient() as client:
