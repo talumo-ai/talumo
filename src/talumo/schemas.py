@@ -31,6 +31,11 @@ class Sensitivity(StrEnum):
     PRIVATE = "private"
 
 
+class LocalModelHint(StrEnum):
+    GENERAL = "general"
+    CODE = "code"
+
+
 class Tier(StrEnum):
     LOCAL = "local"
     REMOTE_CHEAP = "remote_cheap"
@@ -65,6 +70,7 @@ class OrchRequest(BaseModel):
     task_type: TaskType
     finality: Finality = Finality.DRAFT
     sensitivity: Sensitivity = Sensitivity.PRIVATE
+    local_model_hint: LocalModelHint | None = None
     needs_schema: bool = False
     can_test: bool = False
     messages: list[Message]

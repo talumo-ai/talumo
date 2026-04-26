@@ -62,6 +62,8 @@ docker compose up
 
 This starts llama-server (port 8080), LiteLLM (port 4000), and the orchestrator (port 8000).
 
+llama-server runs in router mode and can serve both a general local model and a code local model from one process.
+
 For GPU inference in llama-server:
 
 ```bash
@@ -71,8 +73,14 @@ docker compose -f docker-compose.yml -f docker-compose.cuda.yml up
 Model path variables used by Compose (`.env`):
 
 - `LLAMA_MODEL_HOST_DIR` (default `./models`)
-- `LLAMA_MODEL_CONTAINER_DIR` (default `/models`)
-- `LLAMA_MODEL_FILE` (default `model.gguf`)
+- `LLAMA_MODELS_MAX` (default `2`)
+
+Model IDs and files are configured in `config/llama_models.ini`:
+
+- `local-general` -> `/models/model.gguf`
+- `local-code` -> `/models/code.gguf`
+
+Keep `.env` and `config/llama_models.ini` in sync if you change model filenames.
 
 ## Example request
 
@@ -96,6 +104,7 @@ All settings are configurable via environment variables with `TALUMO_` prefix:
 | `TALUMO_LITELLM_BASE_URL` | `http://localhost:4000/v1` | LiteLLM gateway endpoint |
 | `TALUMO_LITELLM_API_KEY` | `sk-litellm` | LiteLLM master key |
 | `TALUMO_LITELLM_LOCAL_MODEL` | `local` | LiteLLM model name for local tier |
+| `TALUMO_LITELLM_LOCAL_CODE_MODEL` | `local_code` | LiteLLM model name for local code requests |
 | `TALUMO_LITELLM_CHEAP_MODEL` | `cheap` | LiteLLM model name for cheap tier |
 | `TALUMO_LITELLM_FRONTIER_MODEL` | `frontier` | LiteLLM model name for frontier tier |
 | `TALUMO_MAX_TOKENS` | `2048` | Max tokens per completion |
@@ -112,3 +121,14 @@ All settings are configurable via environment variables with `TALUMO_` prefix:
 | `code`/`analysis` + `needs_schema`/`can_test` | `remote_cheap` |
 | `sensitivity: public` | `remote_cheap` |
 | Everything else | `local` |
+
+Within the local tier, code requests automatically use the local code model alias.
+You can override local model selection per request by adding:
+
+```json
+{
+  "local_model_hint": "general"
+}
+```
+
+Allowed values are `general` and `code`.

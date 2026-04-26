@@ -5,6 +5,8 @@ Uses pytest-httpx to mock backend HTTP calls so no real servers are needed.
 
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 from pytest_httpx import HTTPXMock
@@ -12,6 +14,7 @@ from pytest_httpx import HTTPXMock
 from talumo.orchestrator import orchestrate
 from talumo.schemas import (
     Finality,
+    LocalModelHint,
     Message,
     OrchRequest,
     TaskType,
@@ -53,6 +56,7 @@ def _completion(content: str, model: str = "test-model") -> dict[str, object]:
 
 
 GOOD_OUTPUT = "Here is a thorough draft response with sufficient content for the validators."
+CODE_OUTPUT = "```csharp\nConsole.WriteLine(\"FizzBuzz\");\n```"
 
 
 # ---- Claim 1: local-first routing works ----
@@ -182,6 +186,51 @@ async def test_final_goes_to_frontier(httpx_mock: HTTPXMock) -> None:
 
     assert resp.tier_used == Tier.REMOTE_FRONTIER
     assert resp.trace[0].tier == Tier.REMOTE_FRONTIER
+
+
+@pytest.mark.asyncio
+async def test_local_code_task_uses_local_code_alias(httpx_mock: HTTPXMock) -> None:
+    """Code requests on local tier should use the local code alias."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        assert body["model"] == settings.litellm_local_code_model
+        return httpx.Response(200, json=_completion(CODE_OUTPUT, model="local-code"))
+
+    httpx_mock.add_callback(
+        handler,
+        url=f"{settings.litellm_base_url}/chat/completions",
+    )
+
+    async with httpx.AsyncClient() as client:
+        resp = await orchestrate(_req(task_type=TaskType.CODE), client)
+
+    assert resp.tier_used == Tier.LOCAL
+    assert resp.trace[0].model == "local-code"
+
+
+@pytest.mark.asyncio
+async def test_local_model_hint_general_overrides_code_default(httpx_mock: HTTPXMock) -> None:
+    """An explicit local_model_hint should override default code-model routing."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content.decode("utf-8"))
+        assert body["model"] == settings.litellm_local_model
+        return httpx.Response(200, json=_completion(CODE_OUTPUT, model="local-general"))
+
+    httpx_mock.add_callback(
+        handler,
+        url=f"{settings.litellm_base_url}/chat/completions",
+    )
+
+    async with httpx.AsyncClient() as client:
+        resp = await orchestrate(
+            _req(task_type=TaskType.CODE, local_model_hint=LocalModelHint.GENERAL),
+            client,
+        )
+
+    assert resp.tier_used == Tier.LOCAL
+    assert resp.trace[0].model == "local-general"
 
 
 @pytest.mark.asyncio

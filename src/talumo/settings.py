@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     # LiteLLM gateway (all tiers route through LiteLLM)
     litellm_base_url: str = "http://localhost:4000/v1"
     litellm_local_model: str = "local"
+    litellm_local_code_model: str = "local_code"
     litellm_cheap_model: str = "cheap"
     litellm_frontier_model: str = "frontier"
     litellm_api_key: str = "sk-litellm"
