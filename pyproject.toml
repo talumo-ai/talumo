@@ -1,5 +1,5 @@
 [project]
-name = "zora"
+name = "talumo"
 version = "0.1.0"
 description = "MVP local-first LLM orchestrator"
 requires-python = "==3.11.*"

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from zora.schemas import Finality, OrchRequest, Sensitivity, TaskType, Tier
+from talumo.schemas import Finality, OrchRequest, Sensitivity, TaskType, Tier
 
 # ---------------------------------------------------------------------------
 # Escalation ladder

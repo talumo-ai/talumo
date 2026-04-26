@@ -15,16 +15,16 @@ import time
 
 import httpx
 
-from zora.backend import ModelResult, RemoteAPIKeyMissingError, call_model
-from zora.classifier import classify, next_tier
-from zora.schemas import (
+from talumo.backend import ModelResult, RemoteAPIKeyMissingError, call_model
+from talumo.classifier import classify, next_tier
+from talumo.schemas import (
     OrchRequest,
     OrchResponse,
     Tier,
     TraceStep,
     Verdict,
 )
-from zora.validators import run_validators
+from talumo.validators import run_validators
 
 # ---------------------------------------------------------------------------
 # Helpers

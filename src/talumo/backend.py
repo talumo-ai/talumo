@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import httpx
 
-from zora.schemas import Message, Tier
-from zora.settings import settings
+from talumo.schemas import Message, Tier
+from talumo.settings import settings
 
 
 class RemoteAPIKeyMissingError(RuntimeError):

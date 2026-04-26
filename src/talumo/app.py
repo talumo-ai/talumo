@@ -10,9 +10,9 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from zora.orchestrator import orchestrate
-from zora.schemas import OrchRequest, OrchResponse
-from zora.settings import settings
+from talumo.orchestrator import orchestrate
+from talumo.schemas import OrchRequest, OrchResponse
+from talumo.settings import settings
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await app.state.client.aclose()
 
 
-app = FastAPI(title="Zora Orchestrator", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="Talumo Orchestrator", version="0.1.0", lifespan=lifespan)
 
 
 @app.post("/v1/orchestrate", response_model=OrchResponse)

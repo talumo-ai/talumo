@@ -9,8 +9,8 @@ import httpx
 import pytest
 from pytest_httpx import HTTPXMock
 
-from zora.orchestrator import orchestrate
-from zora.schemas import (
+from talumo.orchestrator import orchestrate
+from talumo.schemas import (
     Finality,
     Message,
     OrchRequest,
@@ -18,7 +18,7 @@ from zora.schemas import (
     Tier,
     Verdict,
 )
-from zora.settings import settings
+from talumo.settings import settings
 
 
 @pytest.fixture(autouse=True)
