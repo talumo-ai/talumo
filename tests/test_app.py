@@ -5,8 +5,8 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 from pytest_httpx import HTTPXMock
 
-from zora.app import app
-from zora.settings import settings
+from talumo.app import app
+from talumo.settings import settings
 
 
 def _completion(content: str) -> dict[str, object]:

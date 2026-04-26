@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     min_output_chars: int = 20
     max_output_chars: int = 50_000
 
-    model_config = {"env_prefix": "ZORA_"}
+    model_config = {"env_prefix": "TALUMO_"}
 
 
 settings = Settings()

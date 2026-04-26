@@ -1,4 +1,4 @@
-# Zora — MVP Local-First LLM Orchestrator
+# Talumo — MVP Local-First LLM Orchestrator
 
 A minimal orchestration layer that routes LLM requests through a local-first tiered pipeline with validation and escalation.
 
@@ -21,7 +21,7 @@ The orchestrator:
 ## Project structure
 
 ```
-src/zora/
+src/talumo/
   schemas.py       # Request/response models and enums
   settings.py      # Environment-based configuration
   classifier.py    # Tier selection logic
@@ -45,7 +45,7 @@ pip install -e ".[dev]"
 pytest tests/ -v
 
 # Start the orchestrator (assumes backends are running)
-uvicorn zora.app:app --port 8000
+uvicorn talumo.app:app --port 8000
 ```
 
 ## Running with Docker Compose
@@ -89,20 +89,20 @@ curl -X POST http://localhost:8000/v1/orchestrate \
 
 ## Configuration
 
-All settings are configurable via environment variables with `ZORA_` prefix:
+All settings are configurable via environment variables with `TALUMO_` prefix:
 
 | Variable | Default | Description |
 |---|---|---|
-| `ZORA_LITELLM_BASE_URL` | `http://localhost:4000/v1` | LiteLLM gateway endpoint |
-| `ZORA_LITELLM_API_KEY` | `sk-litellm` | LiteLLM master key |
-| `ZORA_LITELLM_LOCAL_MODEL` | `local` | LiteLLM model name for local tier |
-| `ZORA_LITELLM_CHEAP_MODEL` | `cheap` | LiteLLM model name for cheap tier |
-| `ZORA_LITELLM_FRONTIER_MODEL` | `frontier` | LiteLLM model name for frontier tier |
-| `ZORA_MAX_TOKENS` | `2048` | Max tokens per completion |
-| `ZORA_TEMPERATURE` | `0.2` | Sampling temperature |
-| `ZORA_REQUEST_TIMEOUT` | `120.0` | Backend request timeout in seconds |
-| `ZORA_MIN_OUTPUT_CHARS` | `20` | Minimum acceptable output length |
-| `ZORA_MAX_OUTPUT_CHARS` | `50000` | Maximum acceptable output length |
+| `TALUMO_LITELLM_BASE_URL` | `http://localhost:4000/v1` | LiteLLM gateway endpoint |
+| `TALUMO_LITELLM_API_KEY` | `sk-litellm` | LiteLLM master key |
+| `TALUMO_LITELLM_LOCAL_MODEL` | `local` | LiteLLM model name for local tier |
+| `TALUMO_LITELLM_CHEAP_MODEL` | `cheap` | LiteLLM model name for cheap tier |
+| `TALUMO_LITELLM_FRONTIER_MODEL` | `frontier` | LiteLLM model name for frontier tier |
+| `TALUMO_MAX_TOKENS` | `2048` | Max tokens per completion |
+| `TALUMO_TEMPERATURE` | `0.2` | Sampling temperature |
+| `TALUMO_REQUEST_TIMEOUT` | `120.0` | Backend request timeout in seconds |
+| `TALUMO_MIN_OUTPUT_CHARS` | `20` | Minimum acceptable output length |
+| `TALUMO_MAX_OUTPUT_CHARS` | `50000` | Maximum acceptable output length |
 
 ## Tier selection rules
 

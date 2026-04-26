@@ -1,7 +1,7 @@
 """Tests for output validators."""
 
-from zora.schemas import Message, OrchRequest, TaskType
-from zora.validators import (
+from talumo.schemas import Message, OrchRequest, TaskType
+from talumo.validators import (
     check_code_fence,
     check_json_if_schema,
     check_length,

@@ -12,8 +12,8 @@ from __future__ import annotations
 import json
 from typing import Protocol
 
-from zora.schemas import OrchRequest, TaskType
-from zora.settings import settings
+from talumo.schemas import OrchRequest, TaskType
+from talumo.settings import settings
 
 
 class Validator(Protocol):

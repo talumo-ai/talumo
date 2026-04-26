@@ -1,7 +1,7 @@
 """Tests for tier classification logic."""
 
-from zora.classifier import classify, next_tier
-from zora.schemas import (
+from talumo.classifier import classify, next_tier
+from talumo.schemas import (
     Finality,
     Message,
     OrchRequest,
