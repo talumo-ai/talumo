@@ -2,7 +2,13 @@ model_list:
   # Local model group (proxied to llama-server)
   - model_name: local
     litellm_params:
-      model: openai/model.gguf
+      model: openai/local-general
+      api_base: http://llama-server:8080/v1
+
+  # Local code model group (same llama-server router, different model ID)
+  - model_name: local_code
+    litellm_params:
+      model: openai/local-code
       api_base: http://llama-server:8080/v1
 
   # Cheap remote model group

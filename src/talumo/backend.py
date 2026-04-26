@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import httpx
 
-from talumo.schemas import Message, Tier
+from talumo.schemas import LocalModelHint, Message, OrchRequest, TaskType, Tier
 from talumo.settings import settings
 
 
@@ -16,9 +16,25 @@ def _base_url_for(tier: Tier) -> str:
     return settings.litellm_base_url
 
 
-def _model_for(tier: Tier) -> str:
-    if tier == Tier.LOCAL:
+def _local_model_for(req: OrchRequest | None) -> str:
+    if req is None:
         return settings.litellm_local_model
+
+    if req.local_model_hint == LocalModelHint.GENERAL:
+        return settings.litellm_local_model
+
+    if req.local_model_hint == LocalModelHint.CODE:
+        return settings.litellm_local_code_model
+
+    if req.task_type == TaskType.CODE:
+        return settings.litellm_local_code_model
+
+    return settings.litellm_local_model
+
+
+def _model_for(tier: Tier, req: OrchRequest | None = None) -> str:
+    if tier == Tier.LOCAL:
+        return _local_model_for(req)
     if tier == Tier.REMOTE_CHEAP:
         return settings.litellm_cheap_model
     return settings.litellm_frontier_model
@@ -49,6 +65,7 @@ async def call_model(
     messages: list[Message],
     *,
     client: httpx.AsyncClient,
+    req: OrchRequest | None = None,
     max_tokens: int | None = None,
     temperature: float | None = None,
 ) -> ModelResult:
@@ -58,8 +75,9 @@ async def call_model(
             "OPENAI_API_KEY is not set; remote tiers require a provider API key"
         )
 
+    model_name = _model_for(tier, req=req)
     payload: dict[str, object] = {
-        "model": _model_for(tier),
+        "model": model_name,
         "messages": [m.model_dump() for m in messages],
         "max_tokens": max_tokens or settings.max_tokens,
         "temperature": temperature if temperature is not None else settings.temperature,
@@ -77,5 +95,5 @@ async def call_model(
     return ModelResult(
         content=choice["message"]["content"],
         finish_reason=choice.get("finish_reason", "stop"),
-        model=body.get("model", _model_for(tier)),
+        model=body.get("model", model_name),
     )

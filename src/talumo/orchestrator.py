@@ -61,7 +61,7 @@ async def orchestrate(req: OrchRequest, client: httpx.AsyncClient) -> OrchRespon
     for _attempt in range(3):  # at most: initial + retry + escalate
         t0 = time.monotonic()
         try:
-            result = await call_model(tier, req.messages, client=client)
+            result = await call_model(tier, req.messages, client=client, req=req)
         except RemoteAPIKeyMissingError as exc:
             elapsed = (time.monotonic() - t0) * 1000
             trace.append(_make_step(tier, "unknown", Verdict.ESCALATE, [str(exc)], elapsed))
